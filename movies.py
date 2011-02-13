@@ -1,8 +1,10 @@
+from optparse import OptionParser
 import sys
 import xmlrpclib
 import logging
 import struct
 import os
+import glob 
 
 OK = 0
 NOK = -1
@@ -41,11 +43,13 @@ class Server(object):
             return NOK
 
     def get_movie_data(self, moviesToCheck):
+        self.init_connection()
         moviesData = []
         if self.token == 0:
             logging.debug("Lack of valid token")
             return moviesData, NOK
         moviesData = self.server.CheckMovieHash(self.token, moviesToCheck)
+        self.logout()
         return moviesData, OK
 
     def logout(self):
@@ -60,12 +64,15 @@ class Server(object):
             logging.debug("Logout unsuccesful")
             return NOK
 
+#PURPOSE:       stores data about movie
+#PRECONDITIONS: valid path to movie file
 
 class Movie(object):
 
     def __init__(self):
         self.IMDBID = 0
         self.movieTitle = ""
+        self.hash = 0
 
     def hash_file(self, path):
     #method imported directly from opensubtitles.org
@@ -108,29 +115,108 @@ class Movie(object):
             return NOK
 
 
-def main():
-    #debug
-    logging.basicConfig(level=logging.DEBUG)
+def single_file(filename):
     #intiate connection to opensubtitles.org
     servInstance = Server()
-    servInstance.init_connection()
 
     #below test code - please ignore for now
     #intitiate Movie object
     movie = Movie()
     moviesToCheck = []
     moviesResults = []
-    if (movie.hash_file("TG.avi") == OK):
-        moviesToCheck.append(movie.hash)
-        moviesToCheck.append("1234455")
+    if (movie.hash_file(filename) == OK):
         moviesToCheck.append(movie.hash)
         moviesResults, result = servInstance.get_movie_data(moviesToCheck)
         if result == OK:
             for element in moviesToCheck:
                 print moviesResults['data'][element]
 
-    #end of test code
-    servInstance.logout()
+def directory_scan(path):
+
+    #intiate connection to opensubtitles.org
+    servInstance = Server()
+
+    os.chdir(path)
+    fileList = glob.glob("*.avi" or "*.mpg")
+    if len(fileList) == 0:
+        return sys.exit(2)
+
+    movieList = []
+    for element in fileList:
+        movie = Movie()
+        if (movie.hash_file(element) == OK):
+            movieList.append(movie)
+
+    moviesToCheck = []
+    for movie in movieList:
+        moviesToCheck.append(movie.hash)
+
+    moviesResults, result = servInstance.get_movie_data(moviesToCheck)
+    if result == OK:
+        for element in moviesToCheck:
+            print moviesResults['data'][element]
+
+def directory_scan_recursive(path):
+
+    #intiate connection to opensubtitles.org
+    servInstance = Server()
+    os.chdir(path)
+    finalList = []
+    for root, dirname, filenames in os.walk(path):
+
+        os.chdir(root)
+
+        fileList = glob.glob("*.avi")
+        for element in fileList:
+            finalList.append(os.getcwd() + "/" + element)
+
+    print finalList
+
+    if len(finalList) == 0:
+        return sys.exit(2)
+
+    movieList = []
+    for element in finalList:
+        movie = Movie()
+        if (movie.hash_file(element) == OK):
+            movieList.append(movie)
+
+    moviesToCheck = []
+    for movie in movieList:
+        moviesToCheck.append(movie.hash)
+
+    moviesResults, result = servInstance.get_movie_data(moviesToCheck)
+    if result == OK:
+        for element in moviesToCheck:
+            print moviesResults['data'][element]
+
+        
+def main(argv):
+    parser = OptionParser()
+    parser.add_option("-s", "--single", dest="filename",
+                  help="obtains date for a single file", metavar="FILE")
+    parser.add_option("-f", "--folder", dest="folder",
+                      help="obtains data for files in a folder")
+    parser.add_option("-F", "--folder-recursive", dest="folders",
+                      help="obtains data for files in a folders scanning them recursively")
+    parser.add_option("-d", "--debug", dest="debug", default=False, action="store_true",
+                      help="enables debug mode")
+    (options, args) = parser.parse_args()
+
+    if options.debug == True:
+    #debug
+        logging.basicConfig(level=logging.DEBUG)
+
+    if options.filename:
+        single_file(options.filename)
+    elif options.folder:
+        directory_scan(options.folder)
+    elif options.folders:
+        directory_scan_recursive(options.folders)
+    
+
+
+    
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
