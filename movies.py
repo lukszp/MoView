@@ -5,9 +5,12 @@ import logging
 import struct
 import os
 import glob 
+import imdb
 
+#ERROR CODES
 OK = 0
 NOK = -1
+NO_MOVIES_DETECTED = "No movie files have been found in the specified path."
 
 #PURPOSE:       connects to opensubtitles.org to obtain
 #               IMDB movie id and full title based on hash
@@ -71,8 +74,19 @@ class Movie(object):
 
     def __init__(self):
         self.IMDBID = 0
-        self.movieTitle = ""
+        self.movieTitle = "Not found"
         self.hash = 0
+        self.moviePath = ""
+        self.imdb_movie_object = 0
+
+    def __str__(self):
+        return "IMDBID: %s \t Title: %s \t Path: %s" \
+            % (self.IMDBID, self.movieTitle, self.moviePath)
+
+    def get_imdb_data(self, imdb_access):
+        if self.IMDBID != 0:
+            self.imdb_movie_object = \
+                imdb_access.get_movie(self.IMDBID)
 
     def hash_file(self, path):
     #method imported directly from opensubtitles.org
@@ -114,83 +128,94 @@ class Movie(object):
             logging.debug("Hash not calculated")
             return NOK
 
+def create_movies_dict(finalList):
+    movieDict = {}
+    movieDict = calculate_movies_hash(finalList, movieDict)
+    movieDict = get_movies_data(movieDict)
+    return movieDict
 
-def single_file(filename):
-    #intiate connection to opensubtitles.org
+def calculate_movies_hash(moviesList, movieDict):
+
+    for element in moviesList:
+        movie = Movie()
+        if (movie.hash_file(element) == OK):
+            if (movie.hash not in movieDict):
+                movie.moviePath = element
+                movieDict[movie.hash] = movie
+    return movieDict
+
+def get_movies_data(movieDict):
+
     servInstance = Server()
 
-    #below test code - please ignore for now
-    #intitiate Movie object
-    movie = Movie()
     moviesToCheck = []
-    moviesResults = []
-    if (movie.hash_file(filename) == OK):
-        moviesToCheck.append(movie.hash)
-        moviesResults, result = servInstance.get_movie_data(moviesToCheck)
-        if result == OK:
-            for element in moviesToCheck:
-                print moviesResults['data'][element]
+    for key in movieDict:
+        moviesToCheck.append(movieDict.get(key).hash)
+
+    moviesResults, result = servInstance.get_movie_data(moviesToCheck)
+
+    if result == OK:
+        for element in moviesToCheck:
+            if len(moviesResults['data'][element]) != 0:
+                movieDict[moviesResults['data'][element]["MovieHash"]].movieTitle \
+                    = moviesResults['data'][element]["MovieName"]
+                movieDict[moviesResults['data'][element]["MovieHash"]].IMDBID \
+                    = moviesResults['data'][element]["MovieImdbID"]
+
+    return movieDict
+
+def single_file(filename):
+
+    finalList = []
+    finalList.append(filename)
+    return create_movies_dict(finalList)
 
 def directory_scan(path):
 
-    #intiate connection to opensubtitles.org
-    servInstance = Server()
-
-    os.chdir(path)
-    fileList = glob.glob("*.avi" or "*.mpg")
-    if len(fileList) == 0:
-        return sys.exit(2)
-
-    movieList = []
-    for element in fileList:
-        movie = Movie()
-        if (movie.hash_file(element) == OK):
-            movieList.append(movie)
-
-    moviesToCheck = []
-    for movie in movieList:
-        moviesToCheck.append(movie.hash)
-
-    moviesResults, result = servInstance.get_movie_data(moviesToCheck)
-    if result == OK:
-        for element in moviesToCheck:
-            print moviesResults['data'][element]
-
-def directory_scan_recursive(path):
-
-    #intiate connection to opensubtitles.org
-    servInstance = Server()
     os.chdir(path)
     finalList = []
-    for root, dirname, filenames in os.walk(path):
-
-        os.chdir(root)
-
-        fileList = glob.glob("*.avi")
-        for element in fileList:
-            finalList.append(os.getcwd() + "/" + element)
-
-    print finalList
+    fileList = glob.glob("*.avi" or "*.mpg")
+    for element in fileList:
+        #use absolut path to the movie file
+        finalList.append(os.getcwd() + "/" + element)
 
     if len(finalList) == 0:
+        print NO_MOVIES_DETECTED
+        return sys.exit(2)
+        
+    return create_movies_dict(finalList)
+
+def directory_scan_recursive(path):
+    
+    #change path to selected one
+    os.chdir(path)
+    finalList = []
+
+    #scan all folders under the path for movies
+    for root, dirname, filenames in os.walk(path):
+        os.chdir(root)
+        fileList = glob.glob("*.avi" or "*.mpg")
+        for element in fileList:
+            #use absolut path to the movie file
+            finalList.append(os.getcwd() + "/" + element)
+
+    #no movies found then exit
+    if len(finalList) == 0:
+        print NO_MOVIES_DETECTED
         return sys.exit(2)
 
-    movieList = []
-    for element in finalList:
-        movie = Movie()
-        if (movie.hash_file(element) == OK):
-            movieList.append(movie)
+    return create_movies_dict(finalList)        
 
-    moviesToCheck = []
-    for movie in movieList:
-        moviesToCheck.append(movie.hash)
+def print_movie_dict(movieDict):
+    for movie in movieDict.values():
+        print movie
+        print "-----------------------"
+        print movie.imdb_movie_object.summary()
 
-    moviesResults, result = servInstance.get_movie_data(moviesToCheck)
-    if result == OK:
-        for element in moviesToCheck:
-            print moviesResults['data'][element]
+def get_imdb_movies_data(movieDict, imdb_access):
+    for movie in movieDict.values():
+        movie.get_imdb_data(imdb_access)
 
-        
 def main(argv):
     parser = OptionParser()
     parser.add_option("-s", "--single", dest="filename",
@@ -207,15 +232,18 @@ def main(argv):
     #debug
         logging.basicConfig(level=logging.DEBUG)
 
+    movieDict = {}
+
     if options.filename:
-        single_file(options.filename)
+        movieDict = single_file(options.filename)
     elif options.folder:
-        directory_scan(options.folder)
+        movieDict = directory_scan(options.folder)
     elif options.folders:
-        directory_scan_recursive(options.folders)
+        movieDict = directory_scan_recursive(options.folders)
     
-
-
+    imdb_access = imdb.IMDb()    
+    get_imdb_movies_data(movieDict, imdb_access)
+    print_movie_dict(movieDict)
     
 
 if __name__ == "__main__":
