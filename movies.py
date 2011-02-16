@@ -77,7 +77,7 @@ class Movie(object):
         self.movieTitle = "Not found"
         self.hash = 0
         self.moviePath = ""
-        self.imdb_movie_object = 0
+        self.imdbMovieObject = 0
 
     def __str__(self):
         return "IMDBID: %s \t Title: %s \t Path: %s" \
@@ -85,7 +85,7 @@ class Movie(object):
 
     def get_imdb_data(self, imdb_access):
         if self.IMDBID != 0:
-            self.imdb_movie_object = \
+            self.imdbMovieObject = \
                 imdb_access.get_movie(self.IMDBID)
 
     def hash_file(self, path):
@@ -210,7 +210,7 @@ def print_movie_dict(movieDict):
     for movie in movieDict.values():
         print movie
         print "-----------------------"
-        print movie.imdb_movie_object.summary()
+        print movie.imdbMovieObject.summary()
 
 def get_imdb_movies_data(movieDict, imdb_access):
     for movie in movieDict.values():
