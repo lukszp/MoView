@@ -1,77 +1,71 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Title      : Marked
+Version    : 1.0
+Released   : 20091208
+Description: A two-column fixed-width template suitable for small websites.
+
+-->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Movie List</title>
-<style type="text/css">
-<!--
-@import url("static/style.css");
--->
-</style>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>MoView - Enjoy responsibly</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="static/default.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div id="wrapper">
+  <div id="header">
+    <div id="logo">
+      <h1>MoView - My Movies</h1>
+      <h2>What are you going to do this evening?</h2>
+    </div>
+    <!-- end div#logo -->
+  </div>
+  <!-- end div#header -->
+  <div id="page">
+      <div id="content">
+      <div style="clear: both; height: 20px"></div>
+{{#movie_content}}      
+      <!-- MOVIES CONTENT - START -->
+{{#movie}}
+        <div class="post">
+          <h2 class="title">            
+            <a href="{{#path}} {{pathValue}} {{/path}}">
+              {{#title}} {{titleValue}} {{/title}}
+            </a>
+          </h2>
+          <p class="byline">
+            <strong>Rating:</strong> {{#rating}} {{ratingValue}}  {{/rating}}
+          </p>
+          <div class="entry">
+            <p><strong>Genres:</strong> {{#genres}} {{genresValue}}  {{/genres}}</p>
+            <p><strong>Runtime:</strong> {{#runtime}} {{runtimeValue}}  {{/runtime}}</p>
+            <p><strong>Language:</strong> {{#language}} {{languageValue}}  {{/language}}</p>
+            <p><strong>Plot:</strong></p>
+            <p>{{#plot}} {{plotValue}}  {{/plot}}</p>
+          </div>
+        </div>
+{{/movie}}
+      <!-- MOVIES CONTENT - END -->
+{{/movie_content}}
+      </div>
+      <!-- end div#content -->
+      <div style="clear: both; height: 1px"></div>
+  </div>
+  <!-- end div#page -->
+</div>
+<!-- end div#wrapper -->
+  <div id="footer">
+    <p>Copyright &copy; 2007 Marked. All Rights Reserved. Designed by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>. </p>
 
-{{#tr}}
-  {{#movie}}
-<table id="box-table-a" summary="Movie List">
-    <thead>
-    	<tr>
-            <th scope="col">Path</th>
-            <th scope="col">Title</th>
-            <th scope="col">Genres</th>
-            <th scope="col">Runtime</th>
-            <th scope="col">Language</th>
-            <th scope="col">Rating</th>            
-
-        </tr>
-    </thead>
-    <tbody>
-  <tr>
-    {{#path}}
-      <td><a href="{{pathValue}}">Go to</a></td>
-    {{/path}}
-    {{#title}}
-      <td>{{titleValue}}</td>
-    {{/title}}
-    {{#genres}}
-      <td>{{genresValue}}</td>
-    {{/genres}}
-    {{#runtime}}
-      <td>{{runtimeValue}}</td>
-    {{/runtime}}
-    {{#language}}
-      <td>{{languageValue}}</td>
-    {{/language}}
-    {{#rating}}
-      <td>{{ratingValue}}</td>
-    {{/rating}}
-  </tr>
-    </tbody>
-</table>
-<table id="box-table-a" summary="Movie List">
-    <thead>
-    	<tr>
-            <th scope="col">Plot</th>
-
-        </tr>
-    </thead>
-    <tbody>
-
-  <tr>
-    {{#plot}}
-      <td>{{plotValue}}</td>
-    {{/plot}}
-  </tr>
-    </tbody>
-</table>
-
-  {{/movie}}
-{{/tr}}
-{{#empty}}
-  <p>The list is empty.</p>
-{{/empty}}
-
+  </div>
+  <!-- end div#footer -->
 
 </body>
 </html>
-

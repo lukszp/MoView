@@ -23,7 +23,7 @@ class MovieListView(pystache.View):
                             'plotValue' : movie.plot, 'plot' : True })
         return movies
 
-    def tr(self):
+    def movie_content(self):
         return not self.empty()
 
 
