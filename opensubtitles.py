@@ -10,6 +10,7 @@ Error codes:
 HASH_NOT_CALCULATED = -1
 NO_IMDBID_FOUND = -1
 
+
 class OpenSubtitles():
     """
     Singleton class which allows to obtain movie IMDB ID based
@@ -36,18 +37,18 @@ class OpenSubtitles():
             print "Lack of opensubtitles.org server configuration data." + \
                 "Please check settings."
             sys.exit(2)
-            
+
         cls.proxy = xmlrpclib.ServerProxy(cls.url)
         cls.login = cls.proxy.LogIn(cls.user, cls.password, \
                                         cls.countryCode, cls.ua)
-        
+
         if cls.okCode not in cls.login['status']:
             print "Can't log to opensubtitles.org server. Cause: %s" \
                 % cls.login['status']
             sys.exit(2)
         else:
             cls.token = cls.login['token']
-    
+
     @classmethod
     def get_movie_data(cls, moviesToCheck):
         """
@@ -59,7 +60,7 @@ class OpenSubtitles():
         moviesHashList = []
         moviesHashToPathDict = {}
         """Final movie dictionary which maps movie path to IMDBID"""
-        moviesFinalDict = {}        
+        moviesFinalDict = {}
         """
         Prepare:
         - list of movies hashes which will be sent to opensubtitles.org server
@@ -84,12 +85,12 @@ class OpenSubtitles():
         even if movie has not been found. In other words:
         - if movie data has been deteced then 'data' list is returned
         - if movie data has not been deteced then 'data' list is empty
-        """        
+        """
         moviesResults = cls.proxy.CheckMovieHash(cls.token, moviesHashList)
-        
+
         for hashValue in moviesResults['data']:
             """Check if movie has been found"""
-            if len(moviesResults['data'][hashValue]) != 0:                
+            if len(moviesResults['data'][hashValue]) != 0:
                 """Store movie IMDB in final results dictionary"""
                 moviesFinalDict[moviesHashToPathDict[hashValue]] = \
                     moviesResults['data'][hashValue]["MovieImdbID"]
@@ -97,17 +98,17 @@ class OpenSubtitles():
                 "Mark IMDB ID as not found for not recognized movie"
                 moviesFinalDict[moviesHashToPathDict[hashValue]] = \
                     NO_IMDBID_FOUND
-        
+
         """Close the connection and logout from the server"""
         cls.proxy.LogOut(cls.token)
         cls.token = None
-            
+
         return moviesFinalDict
 
     @classmethod
     def _calculate_hash(cls, path):
         """
-        Method used to calculate unique movie hash. 
+        Method used to calculate unique movie hash.
         Obtained from API resources for opensubtitbles.org
         """
         try:
@@ -143,14 +144,3 @@ class OpenSubtitles():
 
         except(IOError):
             return HASH_NOT_CALCULATED
-        
-
-def test():
-
-    movies = ["aaa", "/media/truecrypt1/Filmy/arw-robin.hood.dvdrip.xvid.cd1.avi", "bbb", "/media/truecrypt1/Filmy/MatkaTeresaodKotoow2O1OPL-www.upload24h.pl/Matka.Teresa.od.Kotow.2010.PL.DVDRip.XviD-www.upload24h.pl.avi"]
-    movies2 = {}
-    movies2 = OpenSubtitles.get_movie_data(movies)
-    print movies2
-
-#test()
-

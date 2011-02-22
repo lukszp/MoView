@@ -9,9 +9,11 @@ import sys
 
 NO_IMDBID_FOUND = -1
 
-def get_list_of_files(path, option = None):
+
+def get_list_of_files(path, option=None):
     """
-    Generates list of absolute paths to video files eg. /home/user/Movies/Matrix.avi
+    Generates list of absolute paths to video
+    files eg. /home/user/Movies/Matrix.avi
     Options:
     - single - scan single file
     - folder - scan specified folder (non-recursivly)
@@ -25,14 +27,15 @@ def get_list_of_files(path, option = None):
         for item in os.listdir(path):
             singleFilePath = os.path.join(path, item)
             if is_movie(singleFilePath):
-                listOfMovies.append(singleFilePath)                
+                listOfMovies.append(singleFilePath)
     elif option == 'recursive':
         for root, dirname, filenames in os.walk(path):
-            filelist = [ os.path.join(root,fi) for fi in filenames ]
+            filelist = [os.path.join(root, fi) for fi in filenames]
             for singleFilePath in filelist:
                 if is_movie(singleFilePath):
                     listOfMovies.append(singleFilePath)
     return listOfMovies
+
 
 def is_directory(path):
     """
@@ -45,6 +48,7 @@ def is_directory(path):
         msg = "%s is not a directory" % path
         raise argparse.ArgumentTypeError(msg)
 
+
 def is_file(path):
     """
     Parser check method.
@@ -55,43 +59,45 @@ def is_file(path):
     else:
         msg = "%s is not a file" % path
         raise argparse.ArgumentTypeError(msg)
-                        
+
+
 def is_movie(path):
     """
     Checks if absolute path points to file and if selected file is video file.
     """
     if os.path.isfile(path):
-        fileType = mimetypes.guess_type(path)        
+        fileType = mimetypes.guess_type(path)
         if fileType[0] != None and 'video' in fileType[0]:
-            return True        
+            return True
     return False
-    
+
+
 def main(argv):
-    
+
     programDescription = 'Script obtains movie data from common Internet '
     programDescription += 'sources like imdb.com, filmweb.pl etc. '
     programDescription += 'Movie title is detected by file name or/and hash value. '
 
     programUsage = 'python %(prog)s [options] path or filename'
 
-    parser = argparse.ArgumentParser(description = programDescription, usage = programUsage)
+    parser = argparse.ArgumentParser(description=programDescription, usage=programUsage)
     parser.add_argument('-f', '--folder', metavar='PATH', type=is_directory, \
-                            help = 'Obtains data for movie file(s) stored in the specified folder')
+                            help='Obtains data for movie file(s) stored in the specified folder')
     parser.add_argument('-s', '--single', metavar='FILE', type=is_file, \
-                            help = 'Obtains data for a single movie file')
+                            help='Obtains data for a single movie file')
     parser.add_argument('-r', '--recursive', metavar='PATH', type=is_directory, \
-                            help = 'Obtains data for movie files from ' + \
+                            help='Obtains data for movie files from ' + \
                             'a folder which is scanned recursively')
 
     args = parser.parse_args()
-    
+
     moviesList = []
 
-    if (args.single):        
+    if (args.single):
         moviesList = get_list_of_files(args.single, 'single')
-    elif (args.folder):        
+    elif (args.folder):
         moviesList = get_list_of_files(args.folder, 'folder')
-    elif (args.recursive):        
+    elif (args.recursive):
         moviesList = get_list_of_files(args.recursive, 'recursive')
 
     movieDict = {}
@@ -111,7 +117,7 @@ def main(argv):
             movie.imdbObject = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.IMDBID)
             movie.prepare_data_from_imdb()
-    
+
 
     f = open('index.html', 'w')
     f.write(MovieListView(moviesDatabase).render())

@@ -2,9 +2,14 @@ import pystache
 
 
 class MovieListView(pystache.View):
+    """
+    Renders list of movies.
+    Input: list of movies.
+    Output: rendered html page.
+    """
     template_path = 'templates'
-    
-    def __init__(self, moviesDatabase = []):
+
+    def __init__(self, moviesDatabase=[]):
         pystache.View.__init__(self)
         self.moviesDatabase = moviesDatabase
 
@@ -15,19 +20,17 @@ class MovieListView(pystache.View):
         movies = []
         for movie in self.moviesDatabase:
             if movie.title != None:
-                movies.append({ 'pathValue' : movie.path, 'path' : True, 
-                                'titleValue' : movie.title, 'title' : True,
-                                'genresValue' : movie.genres, 'genres' : True,
-                                'runtimeValue' : movie.runtime, 'runtime' : True,
-                                'languageValue' : movie.language, 'language' : True,
-                                'ratingValue' : movie.rating, 'rating' : True,
-                                'plotValue' : movie.plot, 'plot' : True })
-        
+                movies.append({'pathValue': movie.path, 'path': True,
+                               'titleValue': movie.title, 'title': True,
+                               'genresValue': movie.genres, 'genres': True,
+                               'runtimeValue': movie.runtime, 'runtime': True,
+                               'languageValue': movie.language, 'language': True,
+                               'ratingValue': movie.rating, 'rating': True,
+                               'plotValue': movie.plot, 'plot': True})
+
         moviesAlphSortedList = sorted(movies, key=lambda k: k['titleValue'])
 
         return moviesAlphSortedList
 
     def movie_content(self):
         return not self.empty()
-
-

@@ -1,6 +1,13 @@
 NO_IMDBID_FOUND = -1
 
+
 class Movie(object):
+    """
+    Store data about movie object.
+    Data is obtained from:
+    imdb.com
+    """
+
     def __init__(self):
         self.IMDBID = NO_IMDBID_FOUND
         self.path = None
@@ -11,18 +18,20 @@ class Movie(object):
         self.language = None
         self.rating = None
         self.plot = None
-        
+
     def prepare_data_from_imdb(self):
-        
-        if (self.imdbObject.has_key('title')):
+
+        keys = self.imdbObject.keys()
+        if ('title' in keys):
             self.title = ''.join(self.imdbObject['title'])
-        if (self.imdbObject.has_key('genres')):
+        if ('genres' in keys):
             self.genres = ' '.join(self.imdbObject['genres'])
-        if (self.imdbObject.has_key('runtime')):
-            self.runtime =  ' '.join(self.imdbObject['runtime'])
-        if (self.imdbObject.has_key('language')):
+        if ('runtimes' in keys):
+            self.runtime = ' '.join(self.imdbObject['runtime'])
+        if ('languages' in keys):
             self.language = ' '.join(self.imdbObject['language'])
-        if (self.imdbObject.has_key('rating')):
+        if ('rating' in keys):
             self.rating = self.imdbObject['rating']
-        if (self.imdbObject.has_key('plot')):
+        if ('plot' in keys):
             self.plot = ' '.join(self.imdbObject['plot'])
+            self.plot = self.plot[:self.plot.find('::')]
