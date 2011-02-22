@@ -13,7 +13,7 @@ Description: A two-column fixed-width template suitable for small websites.
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>MoView - Enjoy responsibly</title>
+<title>MoView - Worth Seeing?</title>
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <link href="static/default.css" rel="stylesheet" type="text/css" />
@@ -22,23 +22,25 @@ Description: A two-column fixed-width template suitable for small websites.
 <div id="wrapper">
   <div id="header">
     <div id="logo">
-      <h1>MoView - My Movies</h1>
-      <h2>What are you going to do this evening?</h2>
+      <h1>MoView</h1>
+      <h2>What are you going to see tonight?</h2>
     </div>
     <!-- end div#logo -->
   </div>
   <!-- end div#header -->
   <div id="page">
       <div id="content">
-      <div style="clear: both; height: 20px"></div>
+        <div style="clear: both; height: 10px"></div>
+  <!-- end div#menu -->
 {{#movie_content}}      
       <!-- MOVIES CONTENT - START -->
 {{#movie}}
         <div class="post">
-          <h2 class="title">            
+          <a name="{{#path}} {{pathValue}} {{/path}}"></a>
+          <h2 class="title">
             <a href="{{#path}} {{pathValue}} {{/path}}">
               {{#title}} {{titleValue}} {{/title}}
-            </a>
+            </a>           
           </h2>
           <p class="byline">
             <strong>Rating:</strong> {{#rating}} {{ratingValue}}  {{/rating}}
@@ -56,6 +58,28 @@ Description: A two-column fixed-width template suitable for small websites.
 {{/movie_content}}
       </div>
       <!-- end div#content -->
+      <div id="sidebar">
+        <ul>
+          <li>
+            <h2>Movies List</h2>
+            <ul>
+{{#movie_content}}      
+      <!-- MOVIES CONTENT - START -->
+{{#movie}}
+              <li>
+                <a href="#{{#path}} {{pathValue}} {{/path}}">
+                  {{#title}} {{titleValue}} {{/title}}
+                </a>
+              </li>
+{{/movie}}
+      <!-- MOVIES CONTENT - END -->
+{{/movie_content}}
+
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!-- end div#sidebar -->
       <div style="clear: both; height: 1px"></div>
   </div>
   <!-- end div#page -->
@@ -63,9 +87,13 @@ Description: A two-column fixed-width template suitable for small websites.
 <!-- end div#wrapper -->
   <div id="footer">
     <p>Copyright &copy; 2007 Marked. All Rights Reserved. Designed by <a href="http://www.freecsstemplates.org/">Free CSS Templates</a>. </p>
-
+    <p id="links"><a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a></p>
   </div>
   <!-- end div#footer -->
 
 </body>
 </html>
+
+
+
+
