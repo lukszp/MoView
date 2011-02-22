@@ -24,6 +24,7 @@ Description: A two-column fixed-width template suitable for small websites.
     <div id="logo">
       <h1>MoView</h1>
       <h2>What are you going to see tonight?</h2>
+      <a name="up"></a>
     </div>
     <!-- end div#logo -->
   </div>
@@ -47,10 +48,13 @@ Description: A two-column fixed-width template suitable for small websites.
           </p>
           <div class="entry">
             <p><strong>Genres:</strong> {{#genres}} {{genresValue}}  {{/genres}}</p>
-            <p><strong>Runtime:</strong> {{#runtime}} {{runtimeValue}}  {{/runtime}}</p>
+            <p><strong>Runtime (minutes):</strong> 
+              {{#runtime}} {{runtimeValue}}  {{/runtime}}
+            </p>
             <p><strong>Language:</strong> {{#language}} {{languageValue}}  {{/language}}</p>
             <p><strong>Plot:</strong></p>
             <p>{{#plot}} {{plotValue}}  {{/plot}}</p>
+            <p><a href="#up">Go up</a></p>
           </div>
         </div>
 {{/movie}}

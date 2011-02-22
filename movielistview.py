@@ -14,14 +14,18 @@ class MovieListView(pystache.View):
     def movie(self):
         movies = []
         for movie in self.moviesDatabase:
-            movies.append({ 'pathValue' : movie.path, 'path' : True, 
-                            'titleValue' : movie.title, 'title' : True,
-                            'genresValue' : movie.genres, 'genres' : True,
-                            'runtimeValue' : movie.runtime, 'runtime' : True,
-                            'languageValue' : movie.language, 'language' : True,
-                            'ratingValue' : movie.rating, 'rating' : True,
-                            'plotValue' : movie.plot, 'plot' : True })
-        return movies
+            if movie.title != None:
+                movies.append({ 'pathValue' : movie.path, 'path' : True, 
+                                'titleValue' : movie.title, 'title' : True,
+                                'genresValue' : movie.genres, 'genres' : True,
+                                'runtimeValue' : movie.runtime, 'runtime' : True,
+                                'languageValue' : movie.language, 'language' : True,
+                                'ratingValue' : movie.rating, 'rating' : True,
+                                'plotValue' : movie.plot, 'plot' : True })
+        
+        moviesAlphSortedList = sorted(movies, key=lambda k: k['titleValue'])
+
+        return moviesAlphSortedList
 
     def movie_content(self):
         return not self.empty()
