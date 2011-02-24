@@ -141,6 +141,8 @@ def main(argv):
         elif (args.recursive):
             moviesList = get_list_of_files(args.recursive, 'recursive')
 
+    print "Working..."
+
     movieDict = {}
     movieDict = OpenSubtitles.get_movie_data(moviesList)
     del moviesList
@@ -153,18 +155,23 @@ def main(argv):
         moviesDatabase.append(movieObj)
     del movieDict
 
+    unique_movies_dict = {}
+
     for movie in moviesDatabase:
         if movie.IMDBID != NO_IMDBID_FOUND:
             movie.imdbObject = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.IMDBID)
             movie.prepare_data_from_imdb()
-
+            unique_movies_dict[movie.IMDBID] = movie 
+        
+    unique_movies_list = unique_movies_dict.values()
 
     f = open('index.html', 'w')
-    f.write(MovieListView(moviesDatabase).render())
+    f.write(MovieListView(unique_movies_list).render())
     f.close()
 
-    print "index.html with movie list has been generated. Thanks for using MoView!"
+    print "index.html with movie list has been generated in the current directory."
+    print "Thanks for using MoView!"
 
     return sys.exit(0)
 
