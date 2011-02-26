@@ -9,9 +9,9 @@ class Movie(object):
     """
 
     def __init__(self):
-        self.IMDBID = NO_IMDBID_FOUND
+        self.imdb_id = NO_IMDBID_FOUND
         self.path = None
-        self.imdbObject = None
+        self.imdb_object = None
         self.title = None
         self.genres = None
         self.runtime = None
@@ -20,18 +20,17 @@ class Movie(object):
         self.plot = None
 
     def prepare_data_from_imdb(self):
-
-        keys = self.imdbObject.keys()
+        keys = self.imdb_object.keys()
         if ('title' in keys):
-            self.title = ''.join(self.imdbObject['title'])
+            self.title = ''.join(self.imdb_object['title'])
         if ('genres' in keys):
-            self.genres = ' '.join(self.imdbObject['genres'])
+            self.genres = ' '.join(self.imdb_object['genres'])
         if ('runtimes' in keys):
-            self.runtime = ' '.join(self.imdbObject['runtime'])
+            self.runtime = ' '.join(self.imdb_object['runtime'])
         if ('languages' in keys):
-            self.language = ' '.join(self.imdbObject['language'])
+            self.language = ' '.join(self.imdb_object['language'])
         if ('rating' in keys):
-            self.rating = self.imdbObject['rating']
+            self.rating = self.imdb_object['rating']
         if ('plot' in keys):
-            self.plot = ' '.join(self.imdbObject['plot'])
+            self.plot = ' '.join(self.imdb_object['plot'])
             self.plot = self.plot[:self.plot.find('::')]

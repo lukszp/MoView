@@ -12,6 +12,7 @@ class ImdbCom():
 
     @classmethod
     def _setup_connection(cls):
+        """Setups connection to imdb.com server"""
         try:
             cls.imdb_access = imdb.IMDb()
         except imdb.IMDbError, err:
@@ -20,6 +21,11 @@ class ImdbCom():
 
     @classmethod
     def get_movie_data_from_imdbcom(cls, imdbid):
+        """
+        Retrivies movie object from imdb.com
+        For more information about movie object please see:
+        http://imdbpy.sourceforge.net/docs/README.package.txt
+        """
         if cls.imdb_access == None:
             cls._setup_connection()
 
