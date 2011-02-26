@@ -99,7 +99,7 @@ def main(argv):
     - if user points to a directory act as with -f option
     - if user points to a movie file act as with -s option
     """
-    if len(argv) == 1:
+    if len(argv) == 1 and ('-' not in argv[0]):
         if is_directory_tf(argv[0]):
             movies_list = get_list_of_files(argv[0], 'folder')
         elif is_file_tf(argv[0]):
