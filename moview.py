@@ -94,10 +94,10 @@ def main():
     movies_list = []
 
     #Single file should be checked
-    if (args.path[0] == 'single'):
+    if args.path[0] == 'single':
         movies_list = get_list_of_files(args.path[1], 'single')
     #Folder should be scanned recusrivly
-    elif (args.path[0] == 'folder' and args.recursive):
+    elif args.path[0] == 'folder' and args.recursive:
         movies_list = get_list_of_files(args.path[1], 'recursive')
     #Folder 
     else:
