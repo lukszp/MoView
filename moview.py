@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 from imdbcom import ImdbCom
 import mimetypes
@@ -37,47 +38,19 @@ def get_list_of_files(path, option=None):
     return list_of_movies
 
 
-def is_directory(path):
+def is_directory_or_file(path):
     """
     Parser check method.
-    Check if specified path points to valid directory.
+    Check if specified path points to valid directory or file.
     """
+    print path
     if os.path.isdir(path):
-        return path
+        return 'folder', path
+    elif os.path.isfile(path):
+        return 'single', path
     else:
-        msg = "%s is not a directory" % path
+        msg = "%s is not a directory or file" % path
         raise argparse.ArgumentTypeError(msg)
-
-
-def is_directory_tf(path):
-    """
-    Check if specified path points to valid directory.
-    """
-    if os.path.isdir(path):
-        return True
-    else:
-        return False
-
-def is_file(path):
-    """
-    Parser check method.
-    Checks if specified path points to valid file.
-    """
-    if os.path.isfile(path):
-        return path
-    else:
-        msg = "%s is not a file" % path
-        raise argparse.ArgumentTypeError(msg)
-
-
-def is_file_tf(path):
-    """
-    Checks if specified path points to valid file.
-    """
-    if os.path.isfile(path):
-        return True
-    else:
-        return False
 
 
 def is_movie(path):
@@ -91,62 +64,53 @@ def is_movie(path):
     return False
 
 
-def main(argv):
+def process_arguments():
 
+    description = 'MoView obtains movie related data from the common internet'
+    description += ' resources like imdb.com or filmweb.pl and renders results'
+    description += ' to index.html file.'
+
+    program_usage = './%(prog)s [-h] [-r] path or filename'
+
+    parser = argparse.ArgumentParser(description = description,
+                                     usage = program_usage)
+    #Optional argument definition
+    parser.add_argument('-r', '--recursive', 
+                        action='store_true',
+                        help='obtain data for movie file(s) from ' + \
+                            'a folder which is scanned recursively')
+    #Positional argument definition
+    parser.add_argument('path', 
+                        metavar='directory/file', 
+                        type=is_directory_or_file,
+                        help='obtain movie data for the specified' + \
+                            ' file or directory')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = process_arguments()
     movies_list = []
-    """
-    Check for default option which is:
-    - if user points to a directory act as with -f option
-    - if user points to a movie file act as with -s option
-    """
-    if len(argv) == 1 and ('-' not in argv[0]):
-        if is_directory_tf(argv[0]):
-            movies_list = get_list_of_files(argv[0], 'folder')
-        elif is_file_tf(argv[0]):
-            movies_list = get_list_of_files(argv[0], 'single')
-        else:
-            print "%s is not a directory nor movie file. " % (argv[0])
-            print "Please use python movies.py --help for help"
-            sys.exit(2)
+
+    #Single file should be checked
+    if (args.path[0] == 'single'):
+        movies_list = get_list_of_files(args.path[1], 'single')
+    #Folder should be scanned recusrivly
+    elif (args.path[0] == 'folder' and args.recursive):
+        movies_list = get_list_of_files(args.path[1], 'recursive')
+    #Folder 
     else:
-        """
-        Parse options.
-        -s - extract data for a single file
-        -f - extract data for a single directory
-        -r - extract data for a directory and for sub-directories
-        using recurisve mode
-        """
-        program_description = 'Script obtains movie data from common Internet '
-        program_description += 'sources like imdb.com, filmweb.pl etc. '
-        program_description += 'Movie title is detected by file name or/and hash value. '
-
-        program_usage = 'python %(prog)s [options] path or filename'
-
-        parser = argparse.ArgumentParser(description=program_description, usage=program_usage)
-        parser.add_argument('-f', '--folder', metavar='PATH', type=is_directory, \
-                                help='Obtains data for movie file(s) stored in the specified folder')
-        parser.add_argument('-s', '--single', metavar='FILE', type=is_file, \
-                                help='Obtains data for a single movie file')
-        parser.add_argument('-r', '--recursive', metavar='PATH', type=is_directory, \
-                                help='Obtains data for movie files from ' + \
-                                'a folder which is scanned recursively')
-
-        args = parser.parse_args()
-
-
-        if (args.single):
-            movies_list = get_list_of_files(args.single, 'single')
-        elif (args.folder):
-            movies_list = get_list_of_files(args.folder, 'folder')
-        elif (args.recursive):
-            movies_list = get_list_of_files(args.recursive, 'recursive')
+        movies_list = get_list_of_files(args.path[1], 'folder')
 
     print "Working..."
 
+    #Obtain imdb id for each movie file
     movie_dict = {}
     movie_dict = OpenSubtitles.get_movie_data(movies_list)
     del movies_list
 
+    #Create movies database which contains movie objects
     movies_database = []
     for element in movie_dict.items():
         movie_obj = Movie()
@@ -155,25 +119,30 @@ def main(argv):
         movies_database.append(movie_obj)
     del movie_dict
 
+    #Obtain movie details from imdb.
     unique_movies_dict = {}
-
     for movie in movies_database:
         if movie.imdb_id != NO_IMDBID_FOUND:
             movie.imdb_object = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.imdb_id)
             movie.prepare_data_from_imdb()
             unique_movies_dict[movie.imdb_id] = movie 
-        
+    
+    #Preapre list of not duplicated movies
+    #Each movie objact on this list contains data from imdb.com
     unique_movies_list = unique_movies_dict.values()
 
+    #Finally render index.html file
     rendered_view_file = open('index.html', 'w')
     rendered_view_file.write(MovieListView(unique_movies_list).render())
     rendered_view_file.close()
 
-    print "index.html with movie list has been generated in the current directory."
+    #That's it!
+    print "index.html with movie list has been " + \
+        "generated in the current directory."
     print "Thanks for using MoView!"
 
     return sys.exit(0)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
