@@ -126,8 +126,12 @@ def main():
             movie.imdb_object = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.imdb_id)
             movie.prepare_data_from_imdb()
+            if movie.imdb_id not in unique_movies_dict.keys():
+                print "\"%s\" processed." % movie.title
             unique_movies_dict[movie.imdb_id] = movie 
-    
+        else:
+            print "\"%s\" not processed - no imdb id detected." % movie.path
+                
     #Preapre list of not duplicated movies
     #Each movie objact on this list contains data from imdb.com
     unique_movies_list = unique_movies_dict.values()
@@ -138,6 +142,7 @@ def main():
     rendered_view_file.close()
 
     #That's it!
+    print "\n"
     print "index.html with movie list has been " + \
         "generated in the current directory."
     print "Thanks for using MoView!"
