@@ -137,12 +137,12 @@ def main():
     unique_movies_list = unique_movies_dict.values()
 
     #Finally render index.html file
+    os.chdir(sys.path[0])
     rendered_view_file = open('index.html', 'w')
     rendered_view_file.write(MovieListView(unique_movies_list).render())
     rendered_view_file.close()
 
     #That's it!
-    print "\n"
     print "index.html with movie list has been " + \
         "generated in the current directory."
     print "Thanks for using MoView!"
