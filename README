@@ -1,4 +1,4 @@
-MoView version 0.1
+MoView version 0.1.1
 
 MoView allows you to obtain most important movie data from imdb.com and choose what's worth watching tonight.
 
@@ -6,17 +6,13 @@ Final results list is rendered as index.html page placed in the MoView execution
 
 Usage:
 
-python moview.py file_name - extracts imdb data for a single movie
+./moview.py file_name - extracts imdb data for a single movie
 
-python moview.py directory_name - extracts imdb data for a single directory
+./moview.py directory_name - extracts imdb data for a single directory
 
-python moview.py -s file_name - extracts imdb data for a single movie
+./moview.py -r directory_name - extracts imdb data scaning recursivly all directories for direcotry_name
 
-python moview.py -f directory_name - extracts imdb data for a single directory
-
-python moview.py -r directory_name - extracts imdb data scaning recursivly all directories for direcotry_name
-
-Please note: in the current version (0.1) not recognized movies are not added to the results list rendered in index.html file.
+Please note: in the current version not recognized movies are not added to the results list rendered in index.html file.
 
 Greetings:
 MoView uses css template obtained from http://www.freecsstemplates.org 
