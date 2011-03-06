@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import argparse
 from imdbcom import ImdbCom
 from jinja2 import Environment, FileSystemLoader
@@ -146,7 +145,7 @@ def main():
     template = env.get_template('index.html')
     #Render results to index.html file
     rendered_file = open('index.html','w')
-    rendered_file.write(template.render(movielist=unique_movies_list))
+    rendered_file.write(template.render(movielist=unique_movies_list).encode('utf-8'))
     rendered_file.close()
     #That's it!
 
