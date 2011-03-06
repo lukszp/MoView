@@ -21,16 +21,16 @@ class Movie(object):
 
     def prepare_data_from_imdb(self):
         keys = self.imdb_object.keys()
-        if ('title' in keys):
+        if 'title' in keys:
             self.title = ''.join(self.imdb_object['title'])
-        if ('genres' in keys):
+        if 'genres' in keys:
             self.genres = ' '.join(self.imdb_object['genres'])
-        if ('runtimes' in keys):
+        if 'runtimes' in keys:
             self.runtime = ' '.join(self.imdb_object['runtime'])
-        if ('languages' in keys):
+        if 'languages' in keys:
             self.language = ' '.join(self.imdb_object['language'])
-        if ('rating' in keys):
+        if 'rating' in keys:
             self.rating = self.imdb_object['rating']
-        if ('plot' in keys):
+        if 'plot' in keys:
             self.plot = ' '.join(self.imdb_object['plot'])
             self.plot = self.plot[:self.plot.find('::')]

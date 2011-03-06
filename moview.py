@@ -94,10 +94,10 @@ def main():
     movies_list = []
 
     #Single file should be checked
-    if (args.path[0] == 'single'):
+    if args.path[0] == 'single':
         movies_list = get_list_of_files(args.path[1], 'single')
     #Folder should be scanned recusrivly
-    elif (args.path[0] == 'folder' and args.recursive):
+    elif args.path[0] == 'folder' and args.recursive:
         movies_list = get_list_of_files(args.path[1], 'recursive')
     #Folder 
     else:
@@ -126,13 +126,18 @@ def main():
             movie.imdb_object = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.imdb_id)
             movie.prepare_data_from_imdb()
+            if movie.imdb_id not in unique_movies_dict.keys():
+                print "\"%s\" processed." % movie.title
             unique_movies_dict[movie.imdb_id] = movie 
-    
+        else:
+            print "\"%s\" not processed - no imdb id detected." % movie.path
+                
     #Preapre list of not duplicated movies
     #Each movie objact on this list contains data from imdb.com
     unique_movies_list = unique_movies_dict.values()
 
     #Finally render index.html file
+    os.chdir(sys.path[0])
     rendered_view_file = open('index.html', 'w')
     rendered_view_file.write(MovieListView(unique_movies_list).render())
     rendered_view_file.close()
