@@ -138,11 +138,9 @@ def main():
 
     #Finally render index.html file
     
-    #os.chdir(sys.path[0])
     #Prepare environment for jinja2
     execution_path = os.path.dirname(os.path.realpath(__file__))
     templates_path = os.path.join(execution_path, 'templates')
-    print templates_path
     env = Environment(loader = FileSystemLoader(templates_path))
     #Select template
     template = env.get_template('index.html')
