@@ -43,7 +43,6 @@ def is_directory_or_file(path):
     Parser check method.
     Check if specified path points to valid directory or file.
     """
-    print path
     if os.path.isdir(path):
         return 'folder', path
     elif os.path.isfile(path):
@@ -92,6 +91,7 @@ def process_arguments():
 def main():
     args = process_arguments()
     movies_list = []
+    os.path.dirname( os.path.realpath( __file__ ) )
 
     #Single file should be checked
     if args.path[0] == 'single':
@@ -138,9 +138,12 @@ def main():
 
     #Finally render index.html file
     
-    os.chdir(sys.path[0])
+    #os.chdir(sys.path[0])
     #Prepare environment for jinja2
-    env = Environment(loader = FileSystemLoader('templates'))
+    execution_path = os.path.dirname(os.path.realpath(__file__))
+    templates_path = os.path.join(execution_path, 'templates')
+    print templates_path
+    env = Environment(loader = FileSystemLoader(templates_path))
     #Select template
     template = env.get_template('index.html')
     #Render results to index.html file
