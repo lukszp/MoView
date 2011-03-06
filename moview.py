@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import argparse
 from imdbcom import ImdbCom
+from jinja2 import Environment, FileSystemLoader
 import mimetypes
 from movie import Movie
-from movielistview import MovieListView
 from opensubtitles import OpenSubtitles
 import os
 import sys
@@ -137,12 +138,18 @@ def main():
     unique_movies_list = unique_movies_dict.values()
 
     #Finally render index.html file
+    
     os.chdir(sys.path[0])
-    rendered_view_file = open('index.html', 'w')
-    rendered_view_file.write(MovieListView(unique_movies_list).render())
-    rendered_view_file.close()
-
+    #Prepare environment for jinja2
+    env = Environment(loader = FileSystemLoader('templates'))
+    #Select template
+    template = env.get_template('index.html')
+    #Render results to index.html file
+    rendered_file = open('index.html','w')
+    rendered_file.write(template.render(movielist=unique_movies_list))
+    rendered_file.close()
     #That's it!
+
     print "index.html with movie list has been " + \
         "generated in the current directory."
     print "Thanks for using MoView!"
@@ -151,3 +158,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
