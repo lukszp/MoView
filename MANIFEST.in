@@ -1,0 +1,2 @@
+recursive-include moview/templates *
+recursive-include moview/static *
