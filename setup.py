@@ -12,40 +12,27 @@ setup(
     name = "moView",
     version = "0.0.1",
     packages = find_packages(),
-
     entry_points = {
         'console_scripts': ['moview=moview.moview:main'],
         },
-
     install_requires=[
         'jinja2',
         'xmlrpclib',
         'argparse',
-        'imdbpy',
+        'IMDbPY>4.0',
         ],
-
     author = "Lukasz Szpak",
     author_email = "lukasz.j.szpak@gmail.com",
     description = ("MoView allows you to obtain most important movie data from "
                    " imdb.com and choose what's worth watching tonight."),
-    license = "BSD",
-
+    license = "GPL",
     keywords = "media film movie utility",
-
     url = "https://github.com/lukszp/MoView",
-
     long_description=read('README'),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
     ],
-    data_files=[('templates', ['moview/templates/index.html']),
-                  ('static', ['moview/static/default.css']),
-                  ('static/images', ['moview/static/images/img01.gif', 
-                                     'moview/static/images/img02.jpg', 
-                                     'moview/static/images/img03.jpg',
-                                     'moview/static/images/img04.jpg',
-                                     'moview/static/images/img05.gif'])],
-
+    include_package_data=True,
 )

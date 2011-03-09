@@ -2,3 +2,10 @@
 *pyc
 emacs
 .#*
+tmp
+ven*
+build/
+dist/
+index.html
+moView.egg-info/
+
