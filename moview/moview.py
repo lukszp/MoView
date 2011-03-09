@@ -6,6 +6,7 @@ import mimetypes
 from movie import Movie
 from opensubtitles import OpenSubtitles
 import os
+import shutil
 import sys
 
 NO_IMDBID_FOUND = -1
@@ -141,6 +142,19 @@ def main():
     #Prepare environment for jinja2
     execution_path = os.path.dirname(os.path.realpath(__file__))
     templates_path = os.path.join(execution_path, 'templates')
+    static_path = os.path.join(execution_path, 'static')
+    #Prepare path for copying static files to cwd
+    templates_cwd_path = os.path.join(os.getcwd(), 'moview/templates')
+    static_cwd_path = os.path.join(os.getcwd(), 'moview/static')
+    #Remove moview tmp files if already exists in cwd
+    try:
+        shutil.rmtree(os.path.join(os.getcwd(), 'moview'))
+    except:
+        pass
+    #Copy static files to cwd under moview direcotry
+    shutil.copytree(templates_path, templates_cwd_path)
+    shutil.copytree(static_path, static_cwd_path)
+    #Prepare environment for jinja2
     env = Environment(loader = FileSystemLoader(templates_path))
     #Select template
     template = env.get_template('index.html')
