@@ -1,6 +1,0 @@
-1. pylint - DONE
-2. title from file
-3. file renaming
-4. filmweb
-5. categories - template updates
-6. sorting - template updates
