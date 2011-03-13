@@ -11,7 +11,7 @@ HASH_NOT_CALCULATED = -1
 NO_IMDBID_FOUND = -1
 
 
-class OpenSubtitles():
+class OpenSubtitles(object):
     """
     Singleton class which allows to obtain movie IMDB ID based
     on hash value calculated for each movie specified by path.

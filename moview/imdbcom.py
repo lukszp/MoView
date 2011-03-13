@@ -1,7 +1,7 @@
 import imdb
 
 
-class ImdbCom():
+class ImdbCom(object):
     """
     ImdbCom class retries movie data from imdb.com database
     Data is retrivied based on imdb movie id.
