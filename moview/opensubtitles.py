@@ -72,11 +72,11 @@ class OpenSubtitles(object):
             """Check if movie file is still under the specified path"""
             if os.path.isfile(movie_path):
                 movie_hash = cls._calculate_hash(movie_path)
-                if movie_hash != HASH_NOT_CALCULATED:
+                if movie_hash != None:
                     movies_hash_list.append(movie_hash)
                     movies_hash_to_path_dict[movie_hash] = movie_path
                 else:
-                    movies_final_dict[movie_path] = NO_IMDBID_FOUND
+                    movies_final_dict[movie_path] = None
 
         """
         Connects with opensubtitles.org to obtain movie related data
@@ -97,7 +97,7 @@ class OpenSubtitles(object):
             else:
                 "Mark IMDB ID as not found for not recognized movie"
                 movies_final_dict[movies_hash_to_path_dict[hash_value]] = \
-                    NO_IMDBID_FOUND
+                    None
 
         """Close the connection and logout from the server"""
         cls.proxy.LogOut(cls.token)
@@ -143,4 +143,4 @@ class OpenSubtitles(object):
             return returnedhash_value
 
         except(IOError):
-            return HASH_NOT_CALCULATED
+            return None

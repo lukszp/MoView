@@ -9,8 +9,6 @@ import os
 import shutil
 import sys
 
-NO_IMDBID_FOUND = -1
-
 
 def get_list_of_files(path, option=None):
     """
@@ -123,7 +121,7 @@ def main():
     #Obtain movie details from imdb.
     unique_movies_dict = {}
     for movie in movies_database:
-        if movie.imdb_id != NO_IMDBID_FOUND:
+        if movie.imdb_id != None:
             movie.imdb_object = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.imdb_id)
             movie.prepare_data_from_imdb()

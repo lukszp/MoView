@@ -1,6 +1,3 @@
-NO_IMDBID_FOUND = -1
-
-
 class Movie(object):
     """
     Store data about movie object.
@@ -10,7 +7,7 @@ class Movie(object):
 
 
     def __init__(self):
-        self.imdb_id = NO_IMDBID_FOUND
+        self.imdb_id = None
         self.path = None
         self.imdb_object = None
         self.title = None
