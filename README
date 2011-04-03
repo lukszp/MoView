@@ -10,6 +10,7 @@ Installation:
 - python setup.py install
 
 Note: before installation make sure that libxml2 and libxslt1 are installed.
+They are needed for imdbpy module.
 
 For  debian based linux you can add them using:
 sudo apt-get install libxml2-dev
