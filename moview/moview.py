@@ -6,6 +6,7 @@ import mimetypes
 from movie import Movie
 from opensubtitles import OpenSubtitles
 import os
+import re
 import shutil
 import sys
 
@@ -61,6 +62,22 @@ def is_movie(path):
             return True
     return False
 
+def obtain_title_and_year(movie):
+    #Obtains title and year from file name or dir name
+    pattern = '^(.+)(\d{4})'
+    file_name = os.path.basename(movie.path)
+    search_result = re.search(pattern, file_name)
+    #Obtain from file name
+    if search_result:
+        movie.title = strip_non_alphanumeric(search_result.groups()[0])
+        movie.year = strip_non_alphanumeric(search_result.groups()[1])
+    #if not possible then check upper directory
+    else:
+        up_dir_name = os.path.split(os.path.dirname(movie.path))[1]
+        search_result = re.search(pattern, up_dir_name)
+        if search_result:
+            movie.title = strip_non_alphanumeric(search_result_2.groups()[0])
+            movie.year = strip_non_alphanumeric(search_result_2.groups()[1])
 
 def process_arguments():
 
@@ -86,6 +103,9 @@ def process_arguments():
     args = parser.parse_args()
     return args
 
+def strip_non_alphanumeric(input_string):
+    pattern = re.compile('[\W_]+')
+    return pattern.sub(' ', input_string) 
 
 def main():
     args = process_arguments()
@@ -118,9 +138,19 @@ def main():
         movies_database.append(movie_obj)
     del movie_dict
 
+    #For movies which has not imdb id detected try to obtain title
+    #from the file name
+    #File name must be in such format: mobie_title_year(4 digits)_extension
+
+    for movie in movies_database:
+        if movie.imdb_id == None:
+            obtain_title_and_year(movie)
+            print "obtained! %s" % (movie.title)
+
     #Obtain movie details from imdb.
     unique_movies_dict = {}
     for movie in movies_database:
+        #imdb id detected - take movie data from imdb.com
         if movie.imdb_id != None:
             movie.imdb_object = \
                 ImdbCom.get_movie_data_from_imdbcom(movie.imdb_id)
@@ -128,8 +158,18 @@ def main():
             if movie.imdb_id not in unique_movies_dict.keys():
                 print "\"%s\" processed." % movie.title
             unique_movies_dict[movie.imdb_id] = movie 
+        #imdb id is not known but title has been obtained from file name
+        elif movie.title != None:
+            movie.imdb_object, movie.imdb_id = \
+                ImdbCom.search_movie_by_title(movie)
+            if movie.imdb_object:
+                movie.prepare_data_from_imdb()
+                if movie.imdb_id not in unique_movies_dict.keys():
+                    print "\"%s\" processed." % movie.title
+                unique_movies_dict[movie.imdb_id] = movie 
         else:
-            print "\"%s\" not processed - no imdb id detected." % movie.path
+            print "\"%s\" not processed." % movie.path
+                    
                 
     #Preapre list of not duplicated movies
     #Each movie objact on this list contains data from imdb.com

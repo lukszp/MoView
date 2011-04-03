@@ -9,6 +9,12 @@ Installation:
 - git clone
 - python setup.py install
 
+Note: before installation make sure that libxml2 and libxslt1 are installed.
+
+For  debian based linux you can add them using:
+sudo apt-get install libxml2-dev
+sudo apt-get install libxslt1-dev 
+
 Usage:
 
 moview file_name - extracts imdb data for a single movie
