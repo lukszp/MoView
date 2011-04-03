@@ -70,13 +70,15 @@ def obtain_title_and_year(movie):
     #Obtain from file name
     if search_result:
         movie.title = strip_non_alphanumeric(search_result.groups()[0])
+        movie.title = strip_release_text(movie.title)
         movie.year = strip_non_alphanumeric(search_result.groups()[1])
     #if not possible then check upper directory
     else:
         up_dir_name = os.path.split(os.path.dirname(movie.path))[1]
-        search_result = re.search(pattern, up_dir_name)
-        if search_result:
+        search_result_2 = re.search(pattern, up_dir_name)
+        if search_result_2:
             movie.title = strip_non_alphanumeric(search_result_2.groups()[0])
+            movie.title = strip_release_text(movie.title)
             movie.year = strip_non_alphanumeric(search_result_2.groups()[1])
 
 def process_arguments():
@@ -106,6 +108,19 @@ def process_arguments():
 def strip_non_alphanumeric(input_string):
     pattern = re.compile('[\W_]+')
     return pattern.sub(' ', input_string) 
+
+def strip_release_text(input_string):
+    release_words = ['dvdrip','DVBRip','DivX', 'SCR',
+                     'DVDscr','VHSRip','TVRip','R5', 'VCD',
+                     'SVCD', 'XVCD', 'xvid', 'x264',
+                     'cvd', 'dvd-r', 'minidvd', 'blueray', 'dvd',
+                     'lector', 'subpl', 'lektor']
+
+    for word in release_words:
+        to_remove = re.compile(word, re.IGNORECASE)
+        input_string = to_remove.sub('', input_string)
+    print input_string
+    return input_string
 
 def main():
     args = process_arguments()
