@@ -11,53 +11,72 @@
 # print response2.info()  # headers
 # print response2.read()  # body (readline and readlines work too)
 
+#Remember about Beautifulsoup downgrade!
+
 import mechanize
 import time
 import re
 from urlparse import urlparse
+import urllib2
 from BeautifulSoup import BeautifulSoup
 
-class MovieInfoScraper(object):
-    def __init__(self, request_stagger = 2):
-        self.request_stagger = request_stagger
-        self.scraping_cache = {}
-        self.scraping_domains = {}
+class MovieDataScraper(object):
+    # Defines stagging time between requests pointed to the same service
+    request_stagger = 2
+    scraping_cache = {}
+    scraping_domains = {}
 
-    def fetch(self, url):
+    @classmethod
+    def fetch(cls, url):
         now = time.time()
         key = url
         advert = False
-        if self.scraping_cache.has_key(key):
+        if cls.scraping_cache.has_key(key):
             print "Debug - getting from cache"
-            data, cached_at, advert_avoided = self.scraping_cache[key]
+            data, cached_at, advert_avoided = cls.scraping_cache[key]
             return data
         domain = urlparse(url)[1]
 #        domain = "www.onet.pl"
         print "Debug - domain: %s " % (domain)
-        if self.scraping_domains.has_key(domain):
-            last_scraped = self.scraping_domains[domain]
+        if cls.scraping_domains.has_key(domain):
+            last_scraped = cls.scraping_domains[domain]
             print last_scraped
             elapsed = now - last_scraped
             print elapsed
-            if elapsed < self.request_stagger:
-                wait_period = self.request_stagger - elapsed
+            if elapsed < cls.request_stagger:
+                wait_period = cls.request_stagger - elapsed
                 print "Debug - need to wait"
                 time.sleep(wait_period)
         else: #advert!
             advert = True
-        self.scraping_domains[domain] = time.time()
+        cls.scraping_domains[domain] = time.time()
         request = mechanize.Request(url)
         response = mechanize.urlopen(request)
         if advert == True:
-            time.sleep(self.request_stagger)
+            time.sleep(cls.request_stagger)
             print "Avoid advert"
             response = mechanize.urlopen(request)
         data = response.read()
-        self.scraping_cache[key] = (data, now, True)
+        cls.scraping_cache[key] = (data, now, True)
         return data
-        
-        
-    def filmweb_scraper(self, title, year):
+
+    def scrap(cls):
+        raise NotImplementedError
+
+class FilmwebScraper(MovieDataScraper):
+#class FilmwebScraper(object):
+
+    def __init__(self):
+        super(FilmwebScraper, self).__init__()
+        self.title = None
+        self.year = None
+        self.genres = []
+        self.description = None
+        self.votes = None
+        self.rating = None
+
+    def scrap(self, title, year):
+        title = urllib2.quote(title)
         query = "http://www.filmweb.pl/search/film?q=" + title
         query += "&startYear=" + year + "&endYear=" + year
         query += "&startRate=&endRate=&startCount=&endCount=&sort=TEXT_SCORE&sortAscending=false"
@@ -67,26 +86,36 @@ class MovieInfoScraper(object):
             title_link = soup.find(True, {'class': 'searchResultTitle'})['href']
             print title_link
         except:
-            return None
+            return False
         query = "http://www.filmweb.pl" + title_link
         print "query %s" % (query)
         result = self.fetch(query)
         soup = BeautifulSoup(result)
-        print soup.title
-        #title = soup({'class' : 'searchResultTitle'}).b.string
-        #print title
-        results = {}
+        print soup.title.string
+
+        self.title = title
+        self.year = year
+
         description = soup.find(True, {'class': 'filmDescrBg', 'property': 'v:summary'})
+
         if description:
-            results['description'] = description.string
-        genres_tmp = soup.find(text="gatunek:").next
-        genres = ""
-        for element in genres_tmp:
-            genres += element.string
-        results['genres'] = genres
-        results['votes'] = soup.find(True, {'property': 'v:votes'}).string
-        results['rating'] = soup.find(True, {'property': 'v:average'}).string
-        return results
+            self.description = description.next
+
+        genres_tmp = soup.find(text="gatunek:")
+        print genres_tmp
+        if genres_tmp:
+            for element in genres_tmp.next:
+                self.genres.append(element.string)
+
+        votes = soup.find(True, {'property': 'v:votes'}).string
+        if votes:
+            self.votes = votes
+
+        rating = soup.find(True, {'property': 'v:average'}).string
+        if rating:
+            self.rating = rating
+
+        return True
 
 #t = MovieInfoScraper()
 #print t.fetch("http://www.filmweb.pl")
